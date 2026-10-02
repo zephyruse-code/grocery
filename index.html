@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F5E3B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>장보기 체크리스트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gothic+A1:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --leaf: #1F5E3B;
+    --leaf-soft: #D7E6D2;
+    --bg: #EEF3E6;
+    --surface: #FFFFFF;
+    --ink: #1C2420;
+    --muted: #6B7A70;
+    --yolk: #F6C343;
+    --yolk-ink: #3A2C05;
+    --tomato: #D9432B;
+    --line: #DCE5D6;
+    --font-sign: "Do Hyeon", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --font-body: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --leaf: #6CC28E; --leaf-soft: #23382B; --bg: #111813; --surface: #1A231D;
+      --ink: #E6EDE4; --muted: #93A398; --yolk: #E9B934; --yolk-ink: #2A1F02;
+      --tomato: #E8644E; --line: #2A372E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --leaf: #6CC28E; --leaf-soft: #23382B; --bg: #111813; --surface: #1A231D;
+    --ink: #E6EDE4; --muted: #93A398; --yolk: #E9B934; --yolk-ink: #2A1F02;
+    --tomato: #E8644E; --line: #2A372E;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100%;
+    background: var(--bg); color: var(--ink);
+    font-family: var(--font-body); font-size: 19px; line-height: 1.4;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app { max-width: 560px; margin: 0 auto; padding: 0 16px 120px; }
+
+  /* Header */
+  header {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--bg); padding: 16px 0 12px;
+  }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  h1 { font-family: var(--font-sign); font-weight: 400; font-size: 26px; margin: 0; color: var(--leaf); }
+
+  .tag {
+    position: relative; display: inline-flex; align-items: baseline; gap: 6px;
+    background: var(--yolk); color: var(--yolk-ink);
+    padding: 6px 16px 6px 26px; border-radius: 6px 14px 14px 6px;
+    font-family: var(--font-sign); font-size: 22px; white-space: nowrap;
+    transform: rotate(-2deg);
+  }
+  .tag::before {
+    content: ""; position: absolute; left: 9px; top: 50%; width: 8px; height: 8px;
+    margin-top: -4px; border-radius: 50%; background: var(--bg);
+  }
+  .tag strong { font-weight: 400; font-size: 30px; }
+  .tag.done { background: var(--leaf); color: var(--surface); }
+  .tag.pop { animation: pop .35s ease; }
+  @keyframes pop { 50% { transform: rotate(-2deg) scale(1.12); } }
+
+  .bar { height: 8px; border-radius: 4px; background: var(--leaf-soft); margin-top: 14px; overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--leaf); border-radius: 4px; transition: width .3s ease; }
+
+  .add { display: flex; gap: 8px; margin-top: 14px; }
+  .add input {
+    flex: 1; min-width: 0; height: 58px; padding: 0 16px;
+    font: 600 20px var(--font-body); color: var(--ink);
+    background: var(--surface); border: 2px solid var(--line); border-radius: 14px;
+    outline: none;
+  }
+  .add input:focus { border-color: var(--leaf); }
+  .add input::placeholder { color: var(--muted); font-weight: 400; }
+  .add button {
+    flex: none; width: 76px; height: 58px; border: 0; border-radius: 14px;
+    background: var(--leaf); color: var(--surface);
+    font: 400 22px var(--font-sign); cursor: pointer;
+  }
+  .add button:active { transform: scale(.96); }
+
+  /* List */
+  ul { list-style: none; margin: 8px 0 0; padding: 0; }
+  li {
+    position: relative; margin-bottom: 8px; border-radius: 14px; overflow: hidden;
+    touch-action: pan-y; background: transparent;
+  }
+  li .behind {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 22px; color: #fff; font: 400 20px var(--font-sign);
+  }
+  .row {
+    position: relative; display: flex; align-items: center; min-height: 66px;
+    background: var(--surface); border-radius: 14px;
+    transition: transform .2s ease;
+  }
+  .row.dragging { transition: none; }
+  .check {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px;
+    min-height: 66px; padding: 10px 6px 10px 16px;
+    background: none; border: 0; color: inherit; text-align: left; cursor: pointer;
+    font: 600 21px var(--font-body);
+  }
+  .box {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    border: 3px solid var(--leaf); display: grid; place-items: center;
+    transition: background .15s ease;
+  }
+  .box svg { width: 20px; height: 20px; opacity: 0; }
+  .name { overflow-wrap: anywhere; }
+  li.checked .row { background: var(--bg); }
+  li.checked .row { box-shadow: inset 0 0 0 2px var(--line); }
+  li.checked .box { background: var(--leaf); }
+  li.checked .box svg { opacity: 1; }
+  li.checked .name { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--muted); opacity: .75; font-weight: 400; }
+  li.swiping { background: var(--tomato); }
+
+  .trash {
+    flex: none; width: 58px; height: 66px; border: 0; background: none; cursor: pointer;
+    color: var(--muted); display: grid; place-items: center;
+  }
+  .trash svg { width: 24px; height: 24px; }
+  .trash:active { color: var(--tomato); }
+
+  .divider { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 10px; padding-left: 4px; font-size: 15px; color: var(--muted); font-weight: 600; overflow: visible; }
+  .uncheck-all { border: 2px solid var(--leaf); background: transparent; color: var(--leaf); font: 600 15px var(--font-body); padding: 0 14px; height: 40px; border-radius: 12px; cursor: pointer; }
+  .uncheck-all.armed { background: var(--leaf); color: var(--surface); }
+  .uncheck-all:active { background: var(--leaf-soft); }
+
+  .empty { text-align: center; padding: 56px 20px; color: var(--muted); }
+  .empty p { margin: 6px 0; }
+  .empty .big { font-family: var(--font-sign); font-size: 26px; color: var(--ink); }
+  .hint { text-align: center; color: var(--muted); font-size: 14px; margin-top: 14px; }
+
+  /* Bottom actions */
+  .actions {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg); border-top: 1px solid var(--line);
+  }
+  .actions .in { max-width: 560px; margin: 0 auto; display: flex; gap: 8px; }
+  .actions button {
+    flex: 1; height: 54px; border-radius: 14px; cursor: pointer;
+    font: 600 17px var(--font-body);
+  }
+  .clear { background: var(--leaf-soft); color: var(--ink); border: 0; }
+  .reset { background: transparent; color: var(--tomato); border: 2px solid var(--tomato); }
+  .reset.armed { background: var(--tomato); color: #fff; }
+  .actions button:disabled { opacity: .4; cursor: default; }
+
+  /* Toast */
+  .toast {
+    position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 7;
+    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px);
+    background: var(--ink); color: var(--bg); padding: 12px 12px 12px 18px; border-radius: 14px;
+    font-size: 16px; transition: opacity .2s, transform .2s;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .toast span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .toast button {
+    flex: none; border: 0; background: var(--yolk); color: var(--yolk-ink);
+    font: 800 15px var(--font-body); padding: 9px 12px; border-radius: 10px; cursor: pointer;
+  }
+
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--yolk); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="top">
+      <h1>장보기</h1>
+      <div class="tag" id="tag" aria-live="polite"></div>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+    <form class="add" id="addForm" autocomplete="off">
+      <input id="input" type="text" placeholder="우유 계란 두부" enterkeyhint="done" aria-label="품목 이름">
+      <button type="submit">추가</button>
+    </form>
+  </header>
+
+  <ul id="list"></ul>
+  <div id="empty" class="empty" hidden>
+    <p class="big">목록이 비어 있어요</p>
+    <p>띄어 쓰면 여러 개를 한 번에 추가해요</p>
+  </div>
+  <p class="hint" id="hint" hidden>품목을 왼쪽으로 밀어도 지울 수 있어요</p>
+</div>
+
+<div class="actions">
+  <div class="in">
+    <button class="clear" id="clearChecked">체크한 항목 지우기</button>
+    <button class="reset" id="resetAll">전체 초기화</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="undo">되돌리기</button></div>
+
+<script>
+(function () {
+  const KEY = 'grocery-checklist-v1';
+  const $ = (id) => document.getElementById(id);
+  const listEl = $('list'), input = $('input');
+  let items = load();
+  let lastDone = null;
+  let undoSnapshot = null, toastTimer = null;
+  let uncheckArmed = null;
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      const data = raw ? JSON.parse(raw) : [];
+      return Array.isArray(data) ? data : [];
+    } catch (e) { return []; }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) {}
+  }
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+  function sorted() {
+    const open = items.filter(i => !i.done).sort((a, b) => a.added - b.added);
+    const done = items.filter(i => i.done).sort((a, b) => a.doneAt - b.doneAt);
+    return { open, done };
+  }
+
+  const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--surface)"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const trashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+
+  function esc(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function itemHTML(i) {
+    return `<li data-id="${i.id}" class="${i.done ? 'checked' : ''}">
+      <div class="behind">삭제</div>
+      <div class="row">
+        <button class="check" role="checkbox" aria-checked="${i.done}">
+          <span class="box">${checkSvg}</span><span class="name">${esc(i.name)}</span>
+        </button>
+        <button class="trash" aria-label="${esc(i.name)} 삭제">${trashSvg}</button>
+      </div>
+    </li>`;
+  }
+
+  function render() {
+    const { open, done } = sorted();
+    let html = open.map(itemHTML).join('');
+    if (done.length) html += `<li class="divider" style="background:none"><span>담은 것 ${done.length}개</span><button class="uncheck-all${uncheckArmed ? ' armed' : ''}" id="uncheckAll">${uncheckArmed ? '한 번 더 누르면 풀기' : '체크 모두 풀기'}</button></li>`;
+    html += done.map(itemHTML).join('');
+    listEl.innerHTML = html;
+
+    const total = items.length, n = done.length;
+    const tag = $('tag');
+    const allDone = total > 0 && n === total;
+    tag.classList.toggle('done', allDone);
+    tag.innerHTML = total === 0 ? '0개' : allDone ? '다 샀어요!' : `${total}개 중 <strong>${n}</strong>개 완료`;
+    if (allDone && lastDone !== true) { tag.classList.remove('pop'); void tag.offsetWidth; tag.classList.add('pop'); }
+    lastDone = allDone;
+
+    $('bar').style.width = total ? (n / total * 100) + '%' : '0';
+    $('empty').hidden = total !== 0;
+    $('hint').hidden = total === 0 || total > 3;
+    $('clearChecked').disabled = n === 0;
+    $('resetAll').disabled = total === 0;
+  }
+
+  function commit() { save(); render(); }
+
+  function showToast(msg) {
+    $('toastMsg').textContent = msg;
+    $('toast').classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { $('toast').classList.remove('show'); undoSnapshot = null; }, 4000);
+  }
+  function snapshot(msg) {
+    undoSnapshot = JSON.parse(JSON.stringify(items));
+    showToast(msg);
+  }
+  $('undo').addEventListener('click', () => {
+    if (undoSnapshot) { items = undoSnapshot; undoSnapshot = null; commit(); }
+    $('toast').classList.remove('show');
+  });
+
+  $('addForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const raw = input.value;
+    const sep = /[,，、\n]/.test(raw) ? /[,，、\n]/ : /\s+/;
+    const names = [...new Set(raw.split(sep).map(s => s.trim()).filter(Boolean))];
+    if (!names.length) { input.value = ''; return; }
+    const now = Date.now();
+    names.forEach((name, idx) => {
+      const existing = items.find(i => i.name === name);
+      if (existing) {
+        if (existing.done) { existing.done = false; existing.added = now + idx; }
+      } else {
+        items.push({ id: uid(), name, done: false, added: now + idx, doneAt: 0 });
+      }
+    });
+    input.value = '';
+    commit();
+    input.focus();
+  });
+
+  function removeItem(id) {
+    const it = items.find(i => i.id === id);
+    if (!it) return;
+    snapshot(`'${it.name}' 지웠어요`);
+    items = items.filter(i => i.id !== id);
+    commit();
+  }
+
+  listEl.addEventListener('click', (e) => {
+    if (e.target.closest('#uncheckAll')) {
+      const n = items.filter(i => i.done).length;
+      if (!n) return;
+      if (!uncheckArmed) {
+        uncheckArmed = setTimeout(() => { uncheckArmed = null; render(); }, 3000);
+        render();
+        return;
+      }
+      clearTimeout(uncheckArmed); uncheckArmed = null;
+      snapshot(`체크 ${n}개를 풀었어요`);
+      const now = Date.now();
+      items.forEach((i, idx) => { if (i.done) { i.done = false; i.doneAt = 0; } });
+      commit();
+      return;
+    }
+    const li = e.target.closest('li[data-id]');
+    if (!li) return;
+    if (li.dataset.swiped) { delete li.dataset.swiped; return; }
+    const id = li.dataset.id;
+    if (e.target.closest('.trash')) { removeItem(id); return; }
+    if (e.target.closest('.check')) {
+      const it = items.find(i => i.id === id);
+      it.done = !it.done;
+      it.doneAt = it.done ? Date.now() : 0;
+      if (navigator.vibrate && it.done) { try { navigator.vibrate(12); } catch (_) {} }
+      commit();
+    }
+  });
+
+  // Swipe left to delete
+  let drag = null;
+  listEl.addEventListener('pointerdown', (e) => {
+    const li = e.target.closest('li[data-id]');
+    if (!li || e.button > 0) return;
+    drag = { li, row: li.querySelector('.row'), x: e.clientX, y: e.clientY, dx: 0, active: false, id: e.pointerId };
+  });
+  listEl.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.active) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.3 && dx < 0) {
+        drag.active = true;
+        drag.li.classList.add('swiping');
+        drag.row.classList.add('dragging');
+        try { drag.li.setPointerCapture(e.pointerId); } catch (_) {}
+      } else if (Math.abs(dy) > 10) { drag = null; return; }
+      else return;
+    }
+    drag.dx = Math.min(0, dx);
+    drag.row.style.transform = `translateX(${drag.dx}px)`;
+  });
+  function endDrag() {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.active) return;
+    d.li.dataset.swiped = '1';
+    d.row.classList.remove('dragging');
+    const w = d.li.offsetWidth;
+    if (d.dx < -w * 0.35) {
+      d.row.style.transform = `translateX(${-w}px)`;
+      setTimeout(() => removeItem(d.li.dataset.id), 180);
+    } else {
+      d.row.style.transform = '';
+      setTimeout(() => { d.li.classList.remove('swiping'); delete d.li.dataset.swiped; }, 220);
+    }
+  }
+  listEl.addEventListener('pointerup', endDrag);
+  listEl.addEventListener('pointercancel', endDrag);
+
+  $('clearChecked').addEventListener('click', () => {
+    const n = items.filter(i => i.done).length;
+    if (!n) return;
+    snapshot(`체크한 ${n}개를 지웠어요`);
+    items = items.filter(i => !i.done);
+    commit();
+  });
+  let resetArmed = null;
+  const resetBtn = $('resetAll');
+  function disarmReset() {
+    clearTimeout(resetArmed); resetArmed = null;
+    resetBtn.classList.remove('armed');
+    resetBtn.textContent = '전체 초기화';
+  }
+  resetBtn.addEventListener('click', () => {
+    if (!items.length) return;
+    if (!resetArmed) {
+      resetBtn.classList.add('armed');
+      resetBtn.textContent = '한 번 더 누르면 삭제';
+      resetArmed = setTimeout(disarmReset, 3000);
+      return;
+    }
+    disarmReset();
+    snapshot('목록을 초기화했어요');
+    items = [];
+    commit();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
