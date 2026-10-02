@@ -95,7 +95,7 @@
   /* List */
   ul { list-style: none; margin: 8px 0 0; padding: 0; }
   li {
-    position: relative; margin-bottom: 8px; border-radius: 14px; overflow: hidden;
+    position: relative; margin-bottom: 6px; border-radius: 12px; overflow: hidden;
     touch-action: pan-y; background: transparent;
   }
   li .behind {
@@ -103,23 +103,23 @@
     padding-right: 22px; color: #fff; font: 400 20px var(--font-sign);
   }
   .row {
-    position: relative; display: flex; align-items: center; min-height: 66px;
-    background: var(--surface); border-radius: 14px;
+    position: relative; display: flex; align-items: center; min-height: 52px;
+    background: var(--surface); border-radius: 12px;
     transition: transform .2s ease;
   }
   .row.dragging { transition: none; }
   .check {
-    flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px;
-    min-height: 66px; padding: 10px 6px 10px 16px;
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px;
+    min-height: 52px; padding: 6px 4px 6px 14px;
     background: none; border: 0; color: inherit; text-align: left; cursor: pointer;
-    font: 600 21px var(--font-body);
+    font: 600 18px var(--font-body);
   }
   .box {
-    flex: none; width: 34px; height: 34px; border-radius: 50%;
-    border: 3px solid var(--leaf); display: grid; place-items: center;
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    border: 2.5px solid var(--leaf); display: grid; place-items: center;
     transition: background .15s ease;
   }
-  .box svg { width: 20px; height: 20px; opacity: 0; }
+  .box svg { width: 16px; height: 16px; opacity: 0; }
   .name { overflow-wrap: anywhere; }
   li.checked .row { background: var(--bg); }
   li.checked .row { box-shadow: inset 0 0 0 2px var(--line); }
@@ -129,10 +129,10 @@
   li.swiping { background: var(--tomato); }
 
   .trash {
-    flex: none; width: 58px; height: 66px; border: 0; background: none; cursor: pointer;
+    flex: none; width: 50px; height: 52px; border: 0; background: none; cursor: pointer;
     color: var(--muted); display: grid; place-items: center;
   }
-  .trash svg { width: 24px; height: 24px; }
+  .trash svg { width: 21px; height: 21px; }
   .trash:active { color: var(--tomato); }
 
   .divider { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 10px; padding-left: 4px; font-size: 15px; color: var(--muted); font-weight: 600; overflow: visible; }
