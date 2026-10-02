@@ -93,9 +93,10 @@
   .add button:active { transform: scale(.96); }
 
   /* List */
-  ul { list-style: none; margin: 8px 0 0; padding: 0; }
+  ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  @media (max-width: 330px) { ul { grid-template-columns: 1fr; } }
   li {
-    position: relative; margin-bottom: 6px; border-radius: 12px; overflow: hidden;
+    position: relative; margin: 0; border-radius: 12px; overflow: hidden;
     touch-action: pan-y; background: transparent;
   }
   li .behind {
@@ -103,23 +104,23 @@
     padding-right: 22px; color: #fff; font: 400 20px var(--font-sign);
   }
   .row {
-    position: relative; display: flex; align-items: center; min-height: 52px;
+    position: relative; display: flex; align-items: center; min-height: 52px; height: 100%;
     background: var(--surface); border-radius: 12px;
     transition: transform .2s ease;
   }
   .row.dragging { transition: none; }
   .check {
-    flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px;
-    min-height: 52px; padding: 6px 4px 6px 14px;
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+    min-height: 52px; padding: 6px 2px 6px 10px;
     background: none; border: 0; color: inherit; text-align: left; cursor: pointer;
-    font: 600 18px var(--font-body);
+    font: 600 18px var(--font-body); line-height: 1.25;
   }
   .box {
-    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
     border: 2.5px solid var(--leaf); display: grid; place-items: center;
     transition: background .15s ease;
   }
-  .box svg { width: 16px; height: 16px; opacity: 0; }
+  .box svg { width: 15px; height: 15px; opacity: 0; }
   .name { overflow-wrap: anywhere; }
   li.checked .row { background: var(--bg); }
   li.checked .row { box-shadow: inset 0 0 0 2px var(--line); }
@@ -129,14 +130,14 @@
   li.swiping { background: var(--tomato); }
 
   .trash {
-    flex: none; width: 50px; height: 52px; border: 0; background: none; cursor: pointer;
+    flex: none; width: 36px; height: 52px; align-self: stretch; border: 0; background: none; cursor: pointer;
     color: var(--muted); display: grid; place-items: center;
   }
-  .trash svg { width: 21px; height: 21px; }
+  .trash svg { width: 18px; height: 18px; }
   .trash:active { color: var(--tomato); }
 
-  .divider { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 10px; padding-left: 4px; font-size: 15px; color: var(--muted); font-weight: 600; overflow: visible; }
-  .uncheck-all { border: 2px solid var(--leaf); background: transparent; color: var(--leaf); font: 600 15px var(--font-body); padding: 0 14px; height: 40px; border-radius: 12px; cursor: pointer; }
+  .divider { display: flex; align-items: center; justify-content: space-between; grid-column: 1 / -1; margin: 8px 0 0; padding-left: 4px; font-size: 14px; color: var(--muted); font-weight: 600; overflow: visible; }
+  .uncheck-all { border: 2px solid var(--leaf); background: transparent; color: var(--leaf); font: 600 15px var(--font-body); padding: 0 12px; height: 36px; border-radius: 10px; cursor: pointer; }
   .uncheck-all.armed { background: var(--leaf); color: var(--surface); }
   .uncheck-all:active { background: var(--leaf-soft); }
 
